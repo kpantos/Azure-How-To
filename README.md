@@ -1,6 +1,6 @@
 # Azure How To Guides
 
-This repository aims to provide a set of walktroughs for different Azure Scenarios
+This repository aims to provide a set of walkthroughs for different Azure Scenarios
 
 ## Table of Contents ##
 

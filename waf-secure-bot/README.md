@@ -339,6 +339,11 @@ Before proceding to the creating of the Azure Bot Service you might want to chec
 >
 > If you opt in for **Prevention** mode some of the channels may not work properly until you manually configure the firewall ruleset. 
 
+### (Optional) Setup Azure Application Gateway access restrictions
+By setting up access restrictions, you can define a priority-ordered allow/deny list that controls network access to your app. The list can include IP addresses or Azure Virtual Network subnets. When there are one or more entries, an implicit deny all exists at the end of the list.
+
+[Setup access restrictions](https://docs.microsoft.com/en-us/azure/app-service/app-service-ip-restrictions#set-a-service-endpoint-based-rule)
+
 ## Create the Azure Bot Service ##
 Next you will need to create the Azure Bot Service that will manage your Bot Registration to different channels.
 
