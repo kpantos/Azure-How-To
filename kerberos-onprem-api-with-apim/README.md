@@ -112,4 +112,50 @@ The first step you'll have to take in order to efectively use application proxy 
 
 ## Setup Azure Application Proxy
 
+1. **Install the connector**: Download the service from the Application Proxy configuration page top bar of your Azure AD. Run the connector installer on a server which has network access to the services you wish to publish through the application proxy – it doesn’t have to be physically in the same location, it can even be on an Azure virtual machine so long as you have a VPN set up. The connector is supported on Windows Server 2012 R2 and newer editions and you can have multiple connectors deployed in groups to achieve HA and scale.
+
+2. **Enable the connector**: Once the setup is complete you’ll need to go back to the Azure portal and the Application Proxy page, if you’ve still got it open then give it a refresh. You’ll see that there’s now a connector group called Default, and inside it is a connector which should show its status as Active. Click on Enable application proxy in the toolbar at the top.
+
+   ![Application Proxy View](images/application-proxy.png)
+
+3. **Create an Application**: Now you will need to create the app you want to access through the App Proxy. Click on Configure an app at the top.
+
+   1. Work your way through the fields, the basic information you’ll need for this is the **internal URL** for the service you want to publish through the proxy, 
+   
+   2. Next enter the **external URL** for your application, 
+   
+      > **NOTE**: You’ll have to configure DNS and upload an SSL certificate if you use anything but the default msappproxy.net domain. A PFX file containing the certificate and private key works here. This address is what your end users will be using to access the internal service.
+   
+   3. Select the **authentication** you want to use. For this walkthrough you will use Azure Active Directory to define who has permission to access this application in Azure, and those permitted access will be allowed through. 
+   
+      > **NOTE**: If your application doesn’t know how to interface with this then you may end up with double authentication prompts for your users – one from Azure, and one from the internal application. The alternative is to use passthrough, where the authentication is handled by the internal application rather than by Azure.
+
+   4. Select the **Default Connector Group** that you have provisioned
+
+      Accept the default values for the other settings and then click Add at the top toolbar
+
+      ![Add AD proxy application](images/add-application.png)
+
+   Once the application is provisioned you can find it by navigating to Azure AD > Enterprise Applications > All applications, and searching for it. You will first need to assign users and/or groups to access it. From the Getting Started icons click on the first one and **add a user that is synced from the on premise AD**.
+
+   ![Proxy application getting started](images/getting-started.png)
+
+   Next you will need to enable Single Sign On. Click the **Set up single sign on** button from the getting started screen to define that you will be using **Windows Integrated Authentication** for this application which allows the Application Proxy Connectors permission in Active Directory to impersonate users to the published application.
+   
+   ![Single Sign On configuration](images/singleSignOn.png)
+
+   Enter the **SPN your on premise application is using**. You can locate the SPN to use by RDPing to one of your AD controllers and opening the Active Directory Users and Computers MMC console and from the properties window of the Web Server going in the Attribute Editor tab.
+
+   > **NOTEs**: 
+   >
+   > A **service principal name** (SPN) is a unique identifier of a service instance. SPNs are used by Kerberos authentication to associate a service instance with a service logon account. This allows a client application to request that the service authenticate an account even if the client does not have the account name.
+   >
+   > If your web site uses a different host name than the default server name ```web-server.contoso.local``` in this case, you will have to add the custom web site host name as an SPN for this server/AD object. For more information on SPN have a look at [TechNet](https://social.technet.microsoft.com/wiki/contents/articles/717.service-principal-names-spn-setspn-syntax.aspx)
+
+   ![Web Server SPN](images/webserver-spn.png)
+
+   Finally select to **use the On-Premises user principal name** part of the Token as the delegated Login Identity for the on premise AD 
+
+   ![Service Principal Name configuration](images/spn-setup.png)
+
 ## Deploy and configure Azure APIM
