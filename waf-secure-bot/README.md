@@ -36,6 +36,9 @@ Using this step by step walthrough you should be able to create and publish a We
 >
 > You can leverage a [public DNS zone](https://docs.microsoft.com/en-us/azure/dns/dns-getstarted-portal) in Azure if you don't already have one. If you do, you will have to point your domain name nameservers to this Azure public DNS zone
 
+## Architecture ##
+![Architecture](images/architecture.png)
+
 ## Create an echo bot
 After installing the [Bot Framework v4 SDK Templates for Visual Studio](https://marketplace.visualstudio.com/items?itemName=BotBuilder.botbuilderv4), follow this [bot service quickstart](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-create-bot?view=azure-bot-service-4.0&tabs=csharp%2Cvs) to create your echo bot using Visual Studio.
 
