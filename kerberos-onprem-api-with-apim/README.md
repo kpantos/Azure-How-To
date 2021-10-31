@@ -107,7 +107,8 @@ You are going to simulate the on premise runing infrastructure in Azure. So you 
    ![Web site sign in](images/sign-in.png)
 
 ## Setup AD Sync
-The first step you'll have to take in order to efectively use application proxy for your on premise application is sync your on premise AD with your Azure AD. To do that you can use Azure AD Connect
+The first step you'll have to take in order to efectively use application proxy for your on premise application is sync your on premise AD with your Azure AD.
+For instruction on how to connect your on premise AD to your Azure AD use the https://docs.microsoft.com/en-us/azure/active-directory/hybrid/how-to-connect-install-express.
 
 
 ## Setup Azure Application Proxy
@@ -159,3 +160,199 @@ The first step you'll have to take in order to efectively use application proxy 
    ![Service Principal Name configuration](images/spn-setup.png)
 
 ## Deploy and configure Azure APIM
+Azure API Management (APIM) helps organizations publish APIs to external, partner, and internal developers to unlock the potential of their data and services. API Management provides the core competencies to ensure a successful API program through developer engagement, business insights, analytics, security, and protection. APIM enables you to create and manage modern API gateways for existing backend services hosted anywhere.
+
+ ### 1. Follow [this quickstart](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance) to create a new API Management instance using the Azure portal. ###
+
+ ### 2. Create a new Application registration ###
+This app registration is going to be used by APIM to access the proxied application (Enterprise Application). To create the app registration 
+
+For details about app registration, see [Quickstart: Configure an application to expose a web API](https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/active-directory/develop/quickstart-configure-app-expose-web-apis.md).
+
+1. In the Azure portal, navigate to Azure AD and search for and select App registrations.
+
+2. Select New registration.
+
+3. When the **Register an application** page appears, enter your application's registration information:
+
+   - In the Name section, enter a meaningful application name that will be displayed to users of the app, such as backend-app.
+   - In the Supported account types section, leave the default Web option.
+
+4. Leave the **Redirect URI** section empty.
+
+5. Select **Register** to create the application.
+
+   ![New Application registration](images/application-registration.png)
+
+6. On the app Overview page, find the **Application (client) ID** value and record it for later.
+
+7. Under the **Manage** section of the side menu, select **Expose an API** and set the **Application ID URI** with the default value. Record this value for later.
+
+   ![Expose API in application registration](images/expose-api-appregistration.png)
+
+8. Select the **API permitions** from the side menu and click **Add a permition**. From the blade that opens up select the **APIs my Organisation uses** tab and search for and select the Enterprise application that has been created as part of the proxying of the on premises application.
+
+   ![https://link](images/api-permition-appregistration.png)
+
+9. Select to **impersonate** the user that accesses the Enterprise Application (proxied application) through this application registration. Click **Add permisssions** to complete the wizard.
+
+   ![https://link](images/impersonation-appregistration.png)
+
+10. Click the **Grant Admin Concent** button at the top bar to complete the api permissions assignement.
+
+11. Create a **client secret** for this application to use in a subsequent step.
+
+   - Under the **Manage** section of the side menu, select **Certificates & secrets**.
+   - Under **Client secrets**, select **New client secret**.
+   - Under **Add a client secret**, provide a **Description** and choose when the key should expire.
+   - Select **Add**.
+
+   When the secret is created, **note the key value** for use in a subsequent step.
+
+ ### 3. Configure OAuth authentication for APIM
+At this point, you have created your applications in Azure AD, and have granted proper permissions to allow any client-app to call the backend-app.
+
+Next you will need to enable OAuth 2.0 user authorization
+
+1. In the Azure portal, find the **Authorization endpoint URL** and **Token endpoint URL** and save them for later. 
+    1. Open the **App registrations** page. 
+    1. Select **Endpoints**.
+    1. Copy the **OAuth 2.0 Authorization Endpoint** and the **OAuth 2.0 Token Endpoint**. 
+
+1. Browse to your API Management instance.
+
+1. Under the **Developer portal** section in the side menu, select **OAuth 2.0 + OpenID Connect**. 
+
+1. Under the **OAuth 2.0** tab, select **Add**.
+
+1. Provide a **Display name** and **Description**.
+
+1. For the **Client registration page URL**, enter a placeholder value, such as `http://localhost`. 
+    * The **Client registration page URL** points to a page where users create and configure their own accounts supported by OAuth 2.0 providers. 
+    * We use a placeholder, since, in this example, users do not create and configure their own accounts.
+
+1. For **Authorization grant types**, select **Authorization code**.
+
+1. Specify the **Authorization endpoint URL** and **Token endpoint URL** you saved earlier: 
+    1. Copy and paste the **OAuth 2.0 Authorization Endpoint** into the **Authorization endpoint URL** text box. 
+    1. Select **POST** under Authorization request method.
+    1. Enter the **OAuth 2.0 Token Endpoint**, and paste it into the **Token endpoint URL** text box. 
+        * If you use the **v1** endpoint:
+          * Add a body parameter named **resource**.
+          * Enter the back-end app **Application ID** for the value.
+        * If you use the **v2** endpoint:
+          * Use the back-end app scope you created in the **Default scope** field.
+          * Set the value for the [`accessTokenAcceptedVersion`](../active-directory/develop/reference-app-manifest.md#accesstokenacceptedversion-attribute) property to `2` in your [application manifest](../active-directory/develop/reference-app-manifest.md).      
+
+   >[!IMPORTANT]
+   >
+   > While you can use either **v1** or **v2** endpoints, we recommend using v2 endpoints. 
+
+1. Specify the client app credentials:
+    * For **Client ID**, use the **Application ID** of the client-app.
+    * For **Client secret**, use the key you created for the client-app earlier. 
+
+1. Make note of the **Redirect URI** for the authorization code grant type.
+
+1. Select **Create**.
+
+1. Return to your client-app registration. 
+ 
+1. Under **Manage**, select **Authentication**.
+
+1. Under **Platform configurations**:
+    * Select the  **Web** platform you created eaarlier. 
+    * Paste the redirect URI you saved earlier under **Redirect URIs**.
+    * Click on **Configure** button to save.
+
+Now that the Developer Console can obtain access tokens from Azure AD via your OAuth 2.0 authorization server, enable OAuth 2.0 user authorization for your API. This enables the Developer Console to know that it needs to obtain an access token on behalf of the user, before making calls to your API.
+
+### 4. Add your first API
+Time to expose your on-premise application through APIM. 
+
+1. Browse to your API Management instance.
+
+1. Under the **APIs** section in the side menu, select **APIs**
+
+1. Click on **HTTP** to manually define an API since you don't have an API definition
+
+1. Select **Full** to enter all values for the **new API definition**
+   * Enter a **Display name** for the API
+   * Enter the programmatic name of the API
+   * Set the **Web Service Url** the APIM will be calling. This should be the proxy application dns name with the api path e.g. ```https://webapi-kpanlab.msappproxy.net/api/```
+   * Select **HTTPS** for the URL scheme
+   * Enter an **API suffix** to distinguish it from other APIs on the same gateway
+   * Select all available **Products**
+   * Click **Create**
+
+   ![New API Definition wizard](images/new-api-definition.png)
+
+1. Click on the **Settings** tab of the newly created API and under the **Security** Section select the OAuth server you created in the previous step.
+   ![Select OAuth for API](images/API-OAuth.png)
+
+### 5. Configure a JWT validation policy to pre-authorize requests
+You will need to Pre-authorize requests in API Management with the Validate JWT policy, by validating the access tokens of each incoming request. If a request does not have a valid token, API Management blocks it.
+
+The following example policy, when added to the <inbound> policy section, checks the value of the audience claim in an access token obtained from Azure AD, and returns an error message if the token is not valid.
+
+   ```xml
+   <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. Access token is missing or invalid.">
+      <openid-config url="https://login.microsoftonline.com/<YOUR-AAD-DOMAIN>/.well-known/openid-configuration" />
+      <audiences>
+            <audience>[Enter the application ID of your Enterprise application here]</audience>
+      </audiences>
+      <required-claims>
+            <claim name="appid" match="all">
+               <value>[Enter the application id of your APIM application registration here]</value>
+            </claim>
+      </required-claims>
+   </validate-jwt>
+   ```
+
+## Testing the application
+1. Get an **Auth Token**
+
+   - Issue a GET request at:
+      ```
+      https://login.microsoftonline.com/<TENANT_ID>/oauth2/v2.0/authorize?client_id=<CLIENT_ID>&response_type=code&redirect_uri=http://localhost&response_mode=query&scope=openid%20offline_access&state=12345
+      ```
+      > **NOTE**: This will prompt you to login. Use a user that has access to the enterprise application that you configured as well as the on premise API.
+
+   - Copy the code returned as a querystring argument in the response
+      > Example
+      >
+      >```http://localhost/?code=```
+      ***0.AUgAUxhucWtI3k6VKgHihM2XA3VzVzjkTsNHp-1Blvlll99IAGM.AQABAAIAAAD--DLA3VO7QrddgJg7WevrO7yBuIEfJH7xNEC_k__B0nb7AYz-RTWmr19aZ7vmss5HN8OyJ7tdEo0KaIDn1Oe_MBPGKPhEAHAdZQB3Dbsa2ZqmblcqFYH9m3dAtZoWFa7kVjtaDadhtd2Qhdy-G8VUZUhQlmcNV0diF6UdYhxgqsvFaH75_CZ_HdlXwf0uvVNeuCphGFD1UyNl6p2keP59w4wkLnUeQ9ZoYhqpMWUjEUDacagvWA4WCSoPwJnk_kqkmxK6MoLkKJUVFKi__s0n738d4SmVW7ruUybXmvz3tEYCSTn9dWafaBBlrUiXTanrKw2cQ0cKvXSzEzzqUVeMG9YGGqwCjxQ1lFXOhPSDaHKHoGW0YzkW3SyIwiGxSllSbCHCoMBNuNH7o45NvG5CrScE6LGWt91ovJL_I1vGYTR0QAlgCoZk5LXXTyAjHO5kAjZItBhlH3YbuRRRHOokazolQx-3a6n06tvsbHPmIszNZlm2uGcS-1CmLAaI1ZgCKhg1npwgp_22CusDfOUCrbmEN7bTnIYOgbHjoxRmjTk27IMH3JuRbFZipVCM5SZqzeg-ru-VG40f5yyUs8uJd3Tl6S6CWtffxBMD49RM1SAA***
+      ```&state=12345&session_state=a8372839-965a-4f7b-a63c-c9deaedac9f9#```
+   
+   - Get a **Token** by sending a post request to:
+      ```https://login.microsoftonline.com/<TENANT_ID>/oauth2/v2.0/token```
+      
+      Passing the following as x-www-form-urlencoded arguments :
+
+      ```
+      client_id:<CLIENT_APPLICATION_REGISTRATION_ID>
+      scope:<PROXIED_ENTERPRISE_APPLICATION_ID>/.default
+      redirect_uri:http://localhost
+      grant_type:authorization_code
+      client_secret:<APPLICATION_REGISTRATION_SECRET>
+      code:<THE CODE RETURNED BY THE PREVIOUS REQUEST>      
+      ```
+      This should return a json document with the Bearer tokens you can use to access the APIM management APIs
+
+      ```json
+      {
+         "token_type": "Bearer",
+         "scope": "0c446fa9-b468-40a6-8893-196dabb00118/user_impersonation 0c446fa9-b468-40a6-8893-196dabb00118/.default",
+         "expires_in": 3937,
+         "ext_expires_in": 3937,
+         "access_token": "...",
+         "refresh_token": "...",
+         "id_token": "..."
+      }
+      ```
+   - Access the API that you configured by sending a GET request at the endpoint that you configured earlier passing the bearer token returned.
+
+
+   
+
