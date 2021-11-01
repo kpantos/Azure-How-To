@@ -325,7 +325,7 @@ The following example policy, when added to the <inbound> policy section, checks
       ***0.AUgAUxhucWtI3k6VKgHihM2XA3VzVzjkTsNHp-1Blvlll99IAGM.AQABAAIAAAD--DLA3VO7QrddgJg7WevrO7yBuIEfJH7xNEC_k__B0nb7AYz-RTWmr19aZ7vmss5HN8OyJ7tdEo0KaIDn1Oe_MBPGKPhEAHAdZQB3Dbsa2ZqmblcqFYH9m3dAtZoWFa7kVjtaDadhtd2Qhdy-G8VUZUhQlmcNV0diF6UdYhxgqsvFaH75_CZ_HdlXwf0uvVNeuCphGFD1UyNl6p2keP59w4wkLnUeQ9ZoYhqpMWUjEUDacagvWA4WCSoPwJnk_kqkmxK6MoLkKJUVFKi__s0n738d4SmVW7ruUybXmvz3tEYCSTn9dWafaBBlrUiXTanrKw2cQ0cKvXSzEzzqUVeMG9YGGqwCjxQ1lFXOhPSDaHKHoGW0YzkW3SyIwiGxSllSbCHCoMBNuNH7o45NvG5CrScE6LGWt91ovJL_I1vGYTR0QAlgCoZk5LXXTyAjHO5kAjZItBhlH3YbuRRRHOokazolQx-3a6n06tvsbHPmIszNZlm2uGcS-1CmLAaI1ZgCKhg1npwgp_22CusDfOUCrbmEN7bTnIYOgbHjoxRmjTk27IMH3JuRbFZipVCM5SZqzeg-ru-VG40f5yyUs8uJd3Tl6S6CWtffxBMD49RM1SAA***
       ```&state=12345&session_state=a8372839-965a-4f7b-a63c-c9deaedac9f9#```
    
-   - Get a **Token** by sending a post request to:
+1. Get a **Token** by sending a post request to:
       ```https://login.microsoftonline.com/<TENANT_ID>/oauth2/v2.0/token```
       
       Passing the following as x-www-form-urlencoded arguments :
@@ -351,7 +351,7 @@ The following example policy, when added to the <inbound> policy section, checks
          "id_token": "..."
       }
       ```
-   - Access the API that you configured by sending a GET request at the endpoint that you configured earlier passing the bearer token returned.
+1. Access the API that you configured by sending a GET request at the endpoint that you configured earlier passing the bearer token returned.
 
 
    
