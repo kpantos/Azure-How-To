@@ -143,7 +143,7 @@ For instruction on how to connect your on premise AD to your Azure AD use the ht
 
    Next you will need to enable Single Sign On. Click the **Set up single sign on** button from the getting started screen to define that you will be using **Windows Integrated Authentication** for this application which allows the Application Proxy Connectors permission in Active Directory to impersonate users to the published application.
    
-   ![Single Sign On configuration](images/singleSignOn.png)
+   ![Single Sign On configuration](images/SingleSignOn.png)
 
    Enter the **SPN your on premise application is using**. You can locate the SPN to use by RDPing to one of your AD controllers and opening the Active Directory Users and Computers MMC console and from the properties window of the Web Server going in the Attribute Editor tab.
 
