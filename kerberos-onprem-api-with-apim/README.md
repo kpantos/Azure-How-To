@@ -281,7 +281,6 @@ Time to expose your on-premise application through APIM.
    * Enter the programmatic name of the API
    * Set the **Web Service Url** the APIM will be calling. This should be the proxy application dns name with the api path e.g. ```https://webapi-kpanlab.msappproxy.net/api/```
    * Select **HTTPS** for the URL scheme
-   * Enter an **API suffix** to distinguish it from other APIs on the same gateway
    * Select all available **Products**
    * Click **Create**
 
@@ -290,8 +289,14 @@ Time to expose your on-premise application through APIM.
 1. Click on the **Settings** tab of the newly created API and under the **Security** Section select the OAuth server you created in the previous step.
    ![Select OAuth for API](images/API-OAuth.png)
 
+1. Add an **Operation** for the newly created API
+   ![Add operation to API](images/add-operation.png)
 ### 5. Configure a JWT validation policy to pre-authorize requests
 You will need to Pre-authorize requests in API Management with the Validate JWT policy, by validating the access tokens of each incoming request. If a request does not have a valid token, API Management blocks it.
+
+Click on the design tab of the newly created API and edit the inbound policy with the policy editor
+
+![Policy editor](images/policy-editor.png)
 
 The following example policy, when added to the <inbound> policy section, checks the value of the audience claim in an access token obtained from Azure AD, and returns an error message if the token is not valid.
 
