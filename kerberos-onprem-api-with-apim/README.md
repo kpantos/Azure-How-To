@@ -151,7 +151,11 @@ For instruction on how to connect your on premise AD to your Azure AD use the ht
    >
    > A **service principal name** (SPN) is a unique identifier of a service instance. SPNs are used by Kerberos authentication to associate a service instance with a service logon account. This allows a client application to request that the service authenticate an account even if the client does not have the account name.
    >
-   > If your web site uses a different host name than the default server name ```web-server.contoso.local``` in this case, you will have to add the custom web site host name as an SPN for this server/AD object. For more information on SPN have a look at [TechNet](https://social.technet.microsoft.com/wiki/contents/articles/717.service-principal-names-spn-setspn-syntax.aspx)
+   > If your web site uses a different host name than the default server name ```web-server.contoso.local``` in this case, you will have to add the custom web site host name as an SPN alias for this server/AD object. 
+   >
+   > [Read more on how to setup an SPN](snd.md)
+   >
+   > For more information on SPN have a look at [TechNet](https://social.technet.microsoft.com/wiki/contents/articles/717.service-principal-names-spn-setspn-syntax.aspx)
 
    ![Web Server SPN](images/webserver-spn.png)
 
