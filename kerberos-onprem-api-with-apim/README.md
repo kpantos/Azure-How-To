@@ -110,10 +110,36 @@ You are going to simulate the on premise runing infrastructure in Azure. So you 
 The first step you'll have to take in order to efectively use application proxy for your on premise application is sync your on premise AD with your Azure AD.
 For instruction on how to connect your on premise AD to your Azure AD use the https://docs.microsoft.com/en-us/azure/active-directory/hybrid/how-to-connect-install-express.
 
+### Configure SSO for different identities
+1. Configure Azure AD Connect settings so the main identity is the email address (mail). This is done as part of the customize process, by changing the **User Principal Name** field in the sync settings. These settings also determine how users log in to Office365, Windows10 devices, and other applications that use Azure AD as their identity store.  
+   ![Identifying users screenshot - User Principal Name dropdown](https://docs.microsoft.com/en-us/azure/active-directory/app-proxy/media/application-proxy-configure-single-sign-on-with-kcd/app_proxy_sso_diff_id_connect_settings.png)  
+2. In the Application Configuration settings for the application you would like to modify, select the **Delegated Login Identity** to be used:
+
+   * User Principal Name (for example, joe@contoso.com)
+   * Alternate User Principal Name (for example, joed@contoso.local)
+   * Username part of User Principal Name (for example, joe)
+   * Username part of Alternate User Principal Name (for example, joed)
+   * On-premises SAM account name (depends on the domain controller configuration)
 
 ## Setup Azure Application Proxy
 
 1. **Install the connector**: Download the service from the Application Proxy configuration page top bar of your Azure AD. Run the connector installer on a server which has network access to the services you wish to publish through the application proxy – it doesn’t have to be physically in the same location, it can even be on an Azure virtual machine so long as you have a VPN set up. The connector is supported on Windows Server 2012 R2 and newer editions and you can have multiple connectors deployed in groups to achieve HA and scale.
+
+      > **NOTES**
+      >
+      > The server running the Connector and the server running the app are domain joined and part of the same domain or trusting domains. For more information on domain join, see Join a Computer to a Domain.
+      >
+      > The server running the Connector has access to read the ```TokenGroupsGlobalAndUniversal``` attribute for users. This default setting might have been impacted by security hardening the environment.
+
+      #### Configure AD for Connector and application server in the same domain
+      1. In Active Directory, go to **Tools** > **Users and Computers**.
+      2. Select the server running the connector.
+      3. Right-click and select **Properties** > **Delegation**.
+      4. Select **Trust this computer for delegation to specified services only**. 
+      5. Select **Use any authentication protocol**.
+      6. Under **Services to which this account can present delegated credentials** add the value for the SPN identity of the application server. This enables the Application Proxy Connector to impersonate users in AD against the applications defined in the list.
+
+         ![Connector-SVR Properties window screenshot](https://docs.microsoft.com/en-us/azure/active-directory/app-proxy/media/application-proxy-configure-single-sign-on-with-kcd/properties.jpg)
 
 2. **Enable the connector**: Once the setup is complete you’ll need to go back to the Azure portal and the Application Proxy page, if you’ve still got it open then give it a refresh. You’ll see that there’s now a connector group called Default, and inside it is a connector which should show its status as Active. Click on Enable application proxy in the toolbar at the top.
 
@@ -154,6 +180,8 @@ For instruction on how to connect your on premise AD to your Azure AD use the ht
    > If your web site uses a different host name than the default server name ```web-server.contoso.local``` in this case, you will have to add the custom web site host name as an SPN alias for this server/AD object. 
    >
    > [Read more on how to setup an SPN](snd.md)
+   > 
+   > Also have a read on [Kerberos Constrained Delegation for single sign-on (SSO) to your apps with Application Proxy](https://docs.microsoft.com/en-us/azure/active-directory/app-proxy/application-proxy-configure-single-sign-on-with-kcd)
    >
    > For more information on SPN have a look at [TechNet](https://social.technet.microsoft.com/wiki/contents/articles/717.service-principal-names-spn-setspn-syntax.aspx)
 
