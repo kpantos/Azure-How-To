@@ -114,7 +114,7 @@ For instruction on how to connect your on premise AD to your Azure AD use the ht
 Configure Azure AD Connect settings so the main identity is the email address (mail). This is done as part of the customize process, by changing the **User Principal Name** field in the sync settings. These settings also determine how users log in to Office365, Windows10 devices, and other applications that use Azure AD as their identity store.  
    ![Identifying users screenshot - User Principal Name dropdown](https://docs.microsoft.com/en-us/azure/active-directory/app-proxy/media/application-proxy-configure-single-sign-on-with-kcd/app_proxy_sso_diff_id_connect_settings.png)  
 
-## Configure the Service Principal Name (SPN)
+## Configure the Service Principal Name
 A **service principal name** (SPN) is a unique identifier of a service instance. SPNs are used by Kerberos authentication to associate a service instance with a service logon account. This allows a client application to request that the service authenticate an account even if the client does not have the account name.
 
 If your web site uses a different host name than the default server name ```web-server.contoso.local```, you will have to add the custom web site host name as an SPN alias for this server/AD object. 
@@ -176,7 +176,7 @@ For more information on SPN have a look at [TechNet](https://social.technet.micr
    
    ![Single Sign On configuration](images/SingleSignOn.png)
 
-   Enter the **SPN your on premise application is using** see section [SPN](##Configure-the-Service-Principal-Name-(SPN)) for more information.
+   Enter the **SPN your on premise application is using** see section [SPN](#configure-the-service-principal-name) for more information.
 
    Finally select to **use the On-Premises user principal name** part of the Token as the delegated Login Identity for the on premise AD 
 
