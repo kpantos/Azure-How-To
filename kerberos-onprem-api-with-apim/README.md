@@ -114,6 +114,15 @@ For instruction on how to connect your on premise AD to your Azure AD use the ht
 Configure Azure AD Connect settings so the main identity is the email address (mail). This is done as part of the customize process, by changing the **User Principal Name** field in the sync settings. These settings also determine how users log in to Office365, Windows10 devices, and other applications that use Azure AD as their identity store.  
    ![Identifying users screenshot - User Principal Name dropdown](https://docs.microsoft.com/en-us/azure/active-directory/app-proxy/media/application-proxy-configure-single-sign-on-with-kcd/app_proxy_sso_diff_id_connect_settings.png)  
 
+## Configure the Service Principal Name (SPN)
+A **service principal name** (SPN) is a unique identifier of a service instance. SPNs are used by Kerberos authentication to associate a service instance with a service logon account. This allows a client application to request that the service authenticate an account even if the client does not have the account name.
+
+If your web site uses a different host name than the default server name ```web-server.contoso.local```, you will have to add the custom web site host name as an SPN alias for this server/AD object. 
+
+[Read more on how to setup an SPN](spn.md)
+
+For more information on SPN have a look at [TechNet](https://social.technet.microsoft.com/wiki/contents/articles/717.service-principal-names-spn-setspn-syntax.aspx)
+
 
 ## Setup Azure Application Proxy
 
@@ -134,6 +143,8 @@ Configure Azure AD Connect settings so the main identity is the email address (m
       6. Under **Services to which this account can present delegated credentials** add the value for the SPN identity of the application server. This enables the Application Proxy Connector to impersonate users in AD against the applications defined in the list.
 
          ![Connector-SVR Properties window screenshot](https://docs.microsoft.com/en-us/azure/active-directory/app-proxy/media/application-proxy-configure-single-sign-on-with-kcd/properties.jpg)
+
+      More information on [Kerberos Constrained Delegation for single sign-on (SSO) to your apps with Application Proxy](https://docs.microsoft.com/en-us/azure/active-directory/app-proxy/application-proxy-configure-single-sign-on-with-kcd)
 
 2. **Enable the connector**: Once the setup is complete you’ll need to go back to the Azure portal and the Application Proxy page, if you’ve still got it open then give it a refresh. You’ll see that there’s now a connector group called Default, and inside it is a connector which should show its status as Active. Click on Enable application proxy in the toolbar at the top.
 
@@ -165,21 +176,7 @@ Configure Azure AD Connect settings so the main identity is the email address (m
    
    ![Single Sign On configuration](images/SingleSignOn.png)
 
-   Enter the **SPN your on premise application is using**. You can locate the SPN to use by RDPing to one of your AD controllers and opening the Active Directory Users and Computers MMC console and from the properties window of the Web Server going in the Attribute Editor tab.
-
-   > **NOTEs**: 
-   >
-   > A **service principal name** (SPN) is a unique identifier of a service instance. SPNs are used by Kerberos authentication to associate a service instance with a service logon account. This allows a client application to request that the service authenticate an account even if the client does not have the account name.
-   >
-   > If your web site uses a different host name than the default server name ```web-server.contoso.local``` in this case, you will have to add the custom web site host name as an SPN alias for this server/AD object. 
-   >
-   > [Read more on how to setup an SPN](snd.md)
-   > 
-   > Also have a read on [Kerberos Constrained Delegation for single sign-on (SSO) to your apps with Application Proxy](https://docs.microsoft.com/en-us/azure/active-directory/app-proxy/application-proxy-configure-single-sign-on-with-kcd)
-   >
-   > For more information on SPN have a look at [TechNet](https://social.technet.microsoft.com/wiki/contents/articles/717.service-principal-names-spn-setspn-syntax.aspx)
-
-   ![Web Server SPN](images/webserver-spn.png)
+   Enter the **SPN your on premise application is using** see section [SPN](##Configure-the-Service-Principal-Name-(SPN)) for more information.
 
    Finally select to **use the On-Premises user principal name** part of the Token as the delegated Login Identity for the on premise AD 
 
