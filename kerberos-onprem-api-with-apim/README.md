@@ -111,15 +111,9 @@ The first step you'll have to take in order to efectively use application proxy 
 For instruction on how to connect your on premise AD to your Azure AD use the https://docs.microsoft.com/en-us/azure/active-directory/hybrid/how-to-connect-install-express.
 
 ### Configure SSO for different identities
-1. Configure Azure AD Connect settings so the main identity is the email address (mail). This is done as part of the customize process, by changing the **User Principal Name** field in the sync settings. These settings also determine how users log in to Office365, Windows10 devices, and other applications that use Azure AD as their identity store.  
+Configure Azure AD Connect settings so the main identity is the email address (mail). This is done as part of the customize process, by changing the **User Principal Name** field in the sync settings. These settings also determine how users log in to Office365, Windows10 devices, and other applications that use Azure AD as their identity store.  
    ![Identifying users screenshot - User Principal Name dropdown](https://docs.microsoft.com/en-us/azure/active-directory/app-proxy/media/application-proxy-configure-single-sign-on-with-kcd/app_proxy_sso_diff_id_connect_settings.png)  
-2. In the Application Configuration settings for the application you would like to modify, select the **Delegated Login Identity** to be used:
 
-   * User Principal Name (for example, joe@contoso.com)
-   * Alternate User Principal Name (for example, joed@contoso.local)
-   * Username part of User Principal Name (for example, joe)
-   * Username part of Alternate User Principal Name (for example, joed)
-   * On-premises SAM account name (depends on the domain controller configuration)
 
 ## Setup Azure Application Proxy
 
